@@ -2,14 +2,23 @@
 	session_start();
 	require("fonctions/traitement.php");
 	if(isset($_POST['submit'])){
-        $user = connexion($_POST['email'], $_POST['password']);
-		$_SESSION['prenom'] = $user['prenom'];
-		$_SESSION['nom'] = $user['nom'];
-		$_SESSION['email'] = $user['email'];
-		$_SESSION['id_user'] = $user['id'];
+		$password = $_POST['password'];
+		$login = $_POST['email'];
+        $user = connexion($login, $password);
         if ($user)
         {
-			header('Location: index.php?lien=profil');
+			$passwordHash = $user['password'];
+			if(password_verify($password, $passwordHash)){
+				$_SESSION['prenom'] = $user['prenom'];
+				$_SESSION['nom'] = $user['nom'];
+				$_SESSION['email'] = $user['email'];
+				$_SESSION['id_user'] = $user['id'];
+				$_SESSION['photo'] = $user['photo'];
+				header('Location: index.php?lien=profil');
+			}else{
+				echo "<script type='text/javascript'>alert('Login ou mot de passe incorect');</script>";
+			}
+			
         } else {
             echo "<script type='text/javascript'>alert('Login ou mot de passe incorect');</script>";
         }

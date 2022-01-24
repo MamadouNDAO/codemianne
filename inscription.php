@@ -1,7 +1,11 @@
 <?php
 	require("fonctions/traitement.php");
 	if(isset($_POST['submit'])){
-		ajoutUser($_POST['prenom'], $_POST['nom'], $_POST['email'], $_POST['password']);
+		$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+		$photo = rand(1, 200).strtolower($_FILES['avatar']['name']);
+		$chemin = "./Image/profil/".$photo;
+		ajoutUser($_POST['prenom'], $_POST['nom'], $_POST['email'], $password, $photo);
+		move_uploaded_file($_FILES['avatar']['tmp_name'], $chemin);
 		echo "<script type='text/javascript'>alert('Utilisateur ajouté avec succès!');</script>";
 		header('Location: index.php');
 	}
@@ -69,7 +73,7 @@
 	<div class="container">
 		<h1 align="CENTER">Inscription</h1>
 		<div class="body">
-			<form action="#" method="post">
+			<form action="#" method="post" enctype="multipart/form-data">
 				<div class=" my-block">
 					<img class="tetee" src="./Image/tetee.png" >
 				<input class="input-text" value="nom" name="nom" type="text">
@@ -87,6 +91,13 @@
 					<img class="cle" src="./Image/cle.png">
 					<input class="input-text" type="password" name="password">
 				</div>
+
+				<div class="my-block">
+					<!--<img class="cle" src="./Image/tetee.png">-->
+					<label for="avatar">Photo</label>
+					<input class="input-text" type="file" name="avatar">
+				</div>
+
 				<div class="button">
 					<button class="btn btn-danger" type="submit"><a style="color: #fff" href="index.php">Retour</a></button>
 					<button class="btn btn-success" name="submit" type="submit">Inscription</button>

@@ -2,12 +2,24 @@
 	session_start();
 	require("fonctions/traitement.php");
 	if(isset($_POST['submit'])){
-		modifiProfil($_POST['prenom'], $_POST['nom'], $_POST['email'], $_SESSION['id_user']);
+		$photo = null;
+		if(isset($_FILES['avatar']) AND !empty($_FILES['avatar']['name'])){
+			$photo = $_SESSION['id_user'].strtolower($_FILES['avatar']['name']);
+			$chemin = "./Image/profil/".$photo;
+			unlink("./Image/profil/".$_SESSION['photo']);
+			move_uploaded_file($_FILES['avatar']['tmp_name'], $chemin);
+		}else{
+			$photo = $_SESSION['photo'];
+		}
+		
+		modifiProfil($_POST['prenom'], $_POST['nom'], $_POST['email'], $_SESSION['id_user'], $photo);
+		
 		$user = getProfil($_SESSION['id_user']);
 		$_SESSION['prenom'] = $user['prenom'];
 		$_SESSION['nom'] = $user['nom'];
 		$_SESSION['email'] = $user['email'];
 		$_SESSION['id_user'] = $user['id'];
+		$_SESSION['photo'] = $user['photo'];
 		header("Refresh:0; url=index.php?lien=profil");
 		echo "<script type='text/javascript'>alert('Profil modifié avec succès!');</script>";
 	}
@@ -79,7 +91,7 @@
 
 	<div class="content">
 		<div class="left-side" >
-			<img class="anne" src="./Image/anne.jpg" >
+			<img class="anne" src="./Image/profil/<?= $_SESSION['photo'] ?>" >
 		</div>
 
 		<div class="right-side card">
@@ -93,7 +105,7 @@
 			</div>
 
 			<div >
-				<form action="#" method="post" style="height: 250px;">
+				<form action="#" method="post" style="height: 250px;" enctype="multipart/form-data">
 					<div  class="mb-3 row">
 						<label class="col-sm-3 col-form-label" for="prenom">Votre prénom :</label>
 						<div class="col-sm-9">
@@ -114,6 +126,14 @@
 							<input type="text" class="form-control" name="email" id="prenom" value="<?= $_SESSION['email'] ?>" placeholder="Email">
 						</div>
 					</div>
+
+					<div class="mb-3 row">
+						<label class="col-sm-3 col-form-label" for="avatar">Photo profil:</label>
+						<div class="col-sm-9">
+							<input type="file" class="form-control" name="avatar" id="prenom" value="<?= $_SESSION['photo'] ?>">
+						</div>
+					</div>
+
 					<div align="middle">
 						<button style="width: 150px;" type="submit" name="submit" class="btn btn-primary">Enregistrer</button>
 					</div>
